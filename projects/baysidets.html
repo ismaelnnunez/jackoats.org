@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>projects | baysidets | baysidets</title>
+		<link rel="stylesheet" href="../styles/main.css">
+	</head>
+
+	<body>
+		<div id="header">
+			<a href="../index.html">
+				<img src="../assets/logos/logo.svg">
+			</a>
+		</div>
+		<div id="main">
+			<div id="nav-links">
+				<a class="nav-link" href="../index.html" id="home">
+					home
+				</a>
+				<a class="nav-link" href="../projects.html" id="projects" style="background-color: hsl(30, 90%, 70%); color: black;">
+					projects
+				</a>
+				<a class="nav-link" href="../blog.html" id="blog">
+					blog
+				</a>
+				<a class="nav-link" href="../wiki.html"  id="wiki">
+					wiki
+				</a>
+			</div>
+			<div id="content">
+				<h1>BAYSIDETS</h1>
+				<h2>Scope</h2>
+				<p>"baysidets" is the name of this website and also the name of a theoretical company that provides <b>T</b>echnical <b>S</b>olutions. This company may or may not be theoretical forever, but the name remains and has actually stuck for me. This website has turned into more of a personal knowledge base and record-keeping effort for me, but at some point in the future I may transfer this domain over to a more professional public-facing website advertising services, and I'll select a more "personal" domain name for this content.</p>
+				<h2>To-do</h2>
+				<h3>General</h3>
+				<ul>
+					<li class="todo-completed">
+						New logo!
+					</li>
+					<li>
+						Set up other pages
+					</li>
+					<li>
+						Script (JS, Shell, Python, or some other) that will ensure certain elements (e.g. nav, footer, some parts of the head) are the same across all pages
+					</li>
+					<li>
+						Add some more substance to the header:
+						<ul>
+							<li>
+								Blurb about what the website offers; if I take the commercial route, what services I offer with a hook
+							</li>
+							<li>
+								Links to other media (e.g. GitHub, ... probably something else too)
+							</li>
+						</ul>
+					</li>
+					<li>
+						Move some stuff from Google Drive knowledge base to here:
+						<ul>
+							<li>
+								Books and book notes
+							</li>
+							<li class="todo-completed">
+								Research and articles
+							</li>
+							<li>
+								Skills and progress tracking
+							</li>
+							<li>
+								Toolkits (like RE calculators, etc.)
+							</li>
+							<li>
+								Business related stuff
+							</li>
+						</ul>
+					</li>
+					<li>
+						Word count at the bottom of every page in footer (word count should only count content in #content)
+					</li>
+				</ul>
+				<h3>Homepage</h3>
+				<ul>
+					<li class="todo-completed">
+						Configure and style headlines
+					</li>
+					<li>
+						Scripts for headlines
+					</li>
+					<li>
+						Make TODO list look nice and pretty, set as template for other sections of homepage
+						<ul>
+							<li>
+								Consider using the details and summary tags. This will come in handy in the TKR page. Refer to <a href="https://iamkate.com/code/tree-views/">https://iamkate.com/code/tree-views/</a>
+							</li>
+							<li class="todo-completed">
+								Make indent hanging (not just first line)
+							</li>
+						</ul>
+					</li>
+					<li>
+						Fill contents of the homepage
+					</li>
+				</ul>
+				<h3>Blog</h3>
+				<ul>
+					<li>
+						Stylize blog landing page
+					</li>
+					<li>
+						Further format blog post page to include key info like date/time
+					</li>
+					<li>
+						Establish required fields to organize blog posts by (e.g. title, date posted, date modified, tags, etc.)
+					</li>
+					<li>
+						Create script allowing users to sort and filter posts
+					</li>
+				</ul>
+				<h2>Log</h2>
+				<h3>2024-10-31</h3>
+				<p>I've been slowly working on this website for a while now, but most of what I've done to it has been some routine HTML/CSS, with the exception of the setup work I did in the beginning (I will at some point make a detailed post somewhere in this website about how I set up the web server, configured DNS records, etc.) Today, however, I finally set up SSL/TLS for baysidets.com with the intention of practicing for when I do it for the <a href="./trolleywebmap.html">trolley webmap</a>, and so I'd like to record how I did it.</p>
+				<p>The process I followed was pretty straightforward thanks to the guide provided in <a href="https://scriptstown.com/how-to-setup-cloudflare-ssl-and-configure-origin-certificate-for-apache/">this handy site</a>. I am regurgitating the information here in case that site ever goes kaput. Anyway, here are the steps:</p>
+				<ol>
+					<li>In your web server, create a directory to store the SSL certificate and key: <span class="file-path">sudo mkdir /etc/apache2/ssl</span></li>
+					<li>Enable SSL in Apache if it hasn't been already: <span class="file-path">sudo a2enmod ssl</span><p class="sub-paragraph">If you're logged in as root, you may get the error <span class="file-path">a2enmod: command not found</span>. If so, log in as a user with sudoer privileges: <span class="file-path">su user</span></p></li>
+					<li>Restart Apache: <span class="file-path">sudo systemctl restart apache2</span></li>
+					<li>Now, in your CloudFlare account, navigate to your domain and go to the <i>SSL/TLS</i> tab, then <i>Origin Server</i>. Click the <i>Create Certificate</i> button. The default options should be O.K. Then click <i>Create</i>. This will generate an <i>Origin Certificate</i>, and a <i>Private Key</i>. Do not leave the page yet as we'll need these values and you will not be able to see the Private Key again.</li>
+					<li>Copy the Origin Certificate value into a file in the SSL directory as such: <span class="file-path">sudo nano /etc/apache2/ssl/example.com.pem</span></li>
+					<li>Copy the Private Key value into a file in the SSL directory as such: <span class="file-path">sudo nano /etc/apache2/ssl/example.com.key</span></li>
+					<li>Change the permission of this directory: <span class="file-path">sudo chmod -R 655 /etc/apache2/ssl</span></li>
+					<li>Change the ownership to "www-data": <span class="file-path">sudo chown -R www-data:www-data /etc/apache2/ssl</span></li>
+					<li>
+						Now, let's configure the web server's virtual host file to use SSL: <span class="file-path">sudo nano /etc/apache2/sites-available/default-ssl.conf</span>
+						<p class="sub-paragraph">Change the file path next to <i>SSLCertificateFile</i> to be your origin certificate, and the file path next to <i>SSLCertificateKeyFile</i> to be your private key.</p>
+					</li>
+					<li>Now, let's activate this virtual host file: <span class="file-path">sudo a2ensite default-ssl.conf</span></li>
+					<li>And now, let's reload Apache: <span class="file-path">sudo systemctl restart apache2</span></li>
+					<li>One other important piece of the puzzle is going into CloudFlare and changing the SSL/TLS encryption mode to <b>Full (strict)</b>.</li>
+					<li>Make sure <b>port 443</b> is enabled in the firewall (e.g. <span class="file-path">sudo ufw allow 443</span>).</li>
+				</ol>
+				<p>That should be all there is to it!</p>
+			</div>
+		</div>
+		<div id="footer">
+			
+		</div>
+	</body>
+</html> 

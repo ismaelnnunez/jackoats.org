@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>projects | Trolley Webmap | baysidets</title>
+		<link rel="stylesheet" href="../styles/main.css">
+	</head>
+
+	<body>
+		<div id="header">
+			<a href="../index.html">
+				<img src="../assets/logos/logo.svg">
+			</a>
+		</div>
+		<div id="main">
+			<div id="nav-links">
+				<a class="nav-link" href="../index.html" id="home">
+					home
+				</a>
+				<a class="nav-link" href="../projects.html" id="projects" style="background-color: hsl(30, 90%, 70%); color: black;">
+					projects
+				</a>
+				<a class="nav-link" href="../blog.html" id="blog">
+					blog
+				</a>
+				<a class="nav-link" href="../wiki.html"  id="wiki">
+					wiki
+				</a>
+			</div>
+			<div id="content">
+				<h1>TROLLEY WEBMAP</h1>
+				<h2>Scope</h2>
+				<p>The end product of this project is a map made available on the internet that shows the real-time live location of the Perth Amboy Hometown Heritage Trolley.</p>
+				<h2>Log</h2>
+				<h3>2024-11-11</h3>
+				<p>I promise I'll get into specifics soon, but for now, I need to make a comprehensive list of what's left before launch.</p>
+				<ul>
+					<li>Enhance website security specifically as it concerns HTTP request headers and <span class="file-path">config.json</span>.</li>
+					<li class="todo-completed">Add a legend.</li>
+					<li>Look into layer rendering order. Not sure if I want the trolley to render above all, but I need to get a handle on how to control it generally.</li>
+					<li class="todo-completed">Consider changing trolley icon color scheme. Look at Vine Transit and other example webmaps. Lots of them have the icon the same color as the route (orange in our case).</li>
+					<li class="todo-completed">Consider making everything thicker and bigger (icons and route).</li>
+					<li class="todo-completed">Explore other map tiles that provide more contrast.</li>
+					<li>Add some directional arrows to the route.</li>
+					<li>Animate trolley movement.</li>
+					<li>Fix Leaflet/map tile attribution.</li>
+				</ul>
+				<h3>2024-11-10</h3>
+				<p>I've done a lot in the past few days and I will get to all of that soon, but I wanted to document a couple of key changes I've made that solved some big problems.</p>
+				<ol>
+					<li><b><i>Finally</i> figuring out the caching issue.</b> After so many attempts to figure this out, I finally figured out that the caching of the website is coming from CloudFlare, and not Apache or the browser. It turns out CloudFlare has a "Cache" section in the domain manager, and this is what was responsible for the page not updating immediately when I pulled the latest git repo commit from the server. I first completely purged the cache and verified that this was, in fact, the culprit. Then, I enabled "Development Mode" which bypasses the cache, and it has worked as expected since then. As I undetstand it, this is supposed to be a temporary measure so I'll have to investigate what the right course of action is, but in the meantime I am happy to have figured this out.</li>
+					<li><b>CORS error seemingly "randomly" appearing.</b> As it turns out, however, it was <i>not</i> random. I figured out that I would only get the CORS error when I visited the website with "www." prepended to it. After some finagling with the Apache site configuration, I set up a redirect for all traffic to <a href="https://perthamboytrolley.com">https://perthamboytrolley.com</a>. I will post more details on this soon.</li>
+				</ul>
+				<h3>2024-11-04</h3>
+				<p>I've managed a solid amount of progress today. Let's walk through it.</p>
+				<ul>
+					<li><b>Tracking Device:</b> No changes here. I have to get into the database and the API documentation to figure out what the device ID is that I have to call, but there is nothing else of note.</li>
+					<li>
+						<b>Data Server:</b> Picking up on yesterday's talk about CORS errors and potentially setting up SSL/TLS for the Traccar server, I figured this was the best course of action for today as setting up bash script to read the latest position straight from the database felt like cheating. After tons of trial and error, I managed to set up HTTPS for Traccar, but it required registering yet another domain. Here was my process:
+						<ol>
+							<li><b>Register a domain.</b> Since I've been using CloudFlare and I like the other features it offers to manage the domain, I registered <span class="file-path">patrolleytraccar.com</span> with them.</li>
+							<li><b>Follow the SSL/TLS setup process outlined <a href="https://baysidets.com/projects/baysidets.html">here</a>.</b> The setup was mostly the same with the exception of a few things I'll get into.</li>
+							<li><b>Allow a new SSL port in your firewall.</b> Since 443 is being used for the other web server, I allowed port 8443 on the firewall as follows: <span class="file-path">sudo ufw allow 8443</span></li>
+							<li><b>Set up a new site configuration for the Traccar instance.</b> I grabbed mine directly from <a href="https://www.traccar.org/secure-connection/">the Traccar documentation</a> while changing the server name from <span class="file-path">demo.traccar.org</span> to <span class="file-path">patrolleytraccar.com</span>, the port from 443 to 8443, and the SSL key locations to their corresponding ones.</li>
+							<li>
+								<b>Alter the <span class="file-path">ports.conf</span> file.</b> This was the mistake I made that had me troubleshooting for at least an hour. I altered my <span class="file-path">ports.conf</span> to include the following:
+								<p class="file-path">
+									&lt;IfModule mod_ssl.c&gt;</br>
+									&nbsp;&nbsp;&nbsp;&nbsp;Listen 8443</br>
+									&lt;/IfModule&gt;
+								</p>
+							</li>
+						</ol>
+					</li>
+					<li><b>Web Server:</b> No changes here.</li>
+					<li><b>Webmap:</b> Placeholder.</li>
+				</ul>
+				<h3>2024-11-03</h3>
+				<p>There is still a lot of work to do but I think I'm getting closer.</p>
+				<ul>
+					<li>
+						<b>Tracking Device:</b> We are all locked and loaded with using Traccar Client on an old iPhone. The setup is mostly straightforward:
+						<ol>
+							<li>Install the <i>Traccar Client</i> application,</li>
+							<li>Open the application and insert the Server URL, which in this case is http://[ipv4 address]:8082,</li>
+							<li>Change the <i>Location accuracy</i> to "High",</li>
+							<li>Change the frequency to 10 (I will be updating this to something more frequent, maybe 1 second, or maybe 5),</li>
+							<li>On the server add, add a new device with the device identifier provided by the <i>Traccar Client</i> app,</li>
+							<li>Untoggle the <i>Service status</i> and retoggle it to start the connection.</li>
+						</ol>
+						<p>At this point, the device should appear <i>Online</i> on the Traccar web interface, but if it does not (as it so happened in my case), you may have to untoggle <i>Offline buffering</i> on the <i>Traccar Client</i> app and the restart the connection.</p>
+					</li>
+					<li>
+						<b>Data Server:</b> There haven't been many changes in this front, but I do want to get into a process I have had to carry out twice already before I have to do it again and have to waste an hour scrambling for the answer to. The issue in question is resetting the password for the "root" account in <i>MySQL</i>.
+						<p>First, it must be stated that when you first install MySQL, the "root" does not require a password. This applies if you've already set a password but happened to have forgotten it. I credit a combination of <a href="https://stackoverflow.com/questions/41984956/cant-reset-root-password-with-skip-grant-tables-on-ubuntu-16">this StackOverflow post</a> and <a href="https://www.digitalocean.com/community/tutorials/how-to-reset-your-mysql-or-mariadb-root-password">this DigitalOcean article</a> for the solution. Basically, you'll want to follow the accepted solution in the StackOverflow post until you get to the point where you have to set the new password, where instead, you should use <span class="file-path">ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password';</span> as the expression in the post is deprecated in recent versions of MySQL.</p>
+						<p>Another potential sticking point might be when running MySQL in safe mode using <span class="file-path">mysqld_safe --skip-grant-tables --skip-networking &</span>, where it might seem like it hangs after you execute the command, but in my experience you can just press enter to proceed to the next steps.</p>
+						<p>After coming back to this the next day, I've realized another mistake I made. So while I updated my password manually within MySQL, I did not update it in the <span class="file-path">traccar.xml</span>. I freaked out for a bit when I could not connect to the page, but ChatGPT and some common sense led me to my lightbulb moment.</p>
+					</li>
+					<li><b>Web Server:</b> This is where much of the work the last few days has been spent. I set up SSL/TLS using the instructions I described <a href="https://baysidets.com/projects/baysidets.html">in my page about this website</a>. The process was basically identical. The client wanted to also reserve the .org TLD, so I also had to set up redirect rules on CloudFlare after registering the domain. They explain this process <a href="https://developers.cloudflare.com/fundamentals/setup/manage-domains/redirect-domain/">here</a> better than I possibly could. But anyway, now you can visit both <a href="https://perthamboytrolley.com">https://perthamboytrolley.com</a> and <a href="https://perthamboytrolley.org">https://perthamboytrolley.org</a> and you'll be taken to <a href="https://perthamboytrolley.com">https://perthamboytrolley.com</a>.</li>
+					<li>
+						<b>Webmap:</b> This is where most of the challenges have been concentrated. I have an O.K. hang on the Fetch API, at least as far as I need it for the webmap, but now I am coming across other networking and browser-related obstacles. As I tried to acquire the route by fetching the GeoJSON file I placed in a subfolder, I kept getting the following two errors: one related to Cross-Origin Resource Sharing (CORS), and the other related to mixed active content loading, and they are both related. I managed to resolve this issue for the GeoJSON (and this solution would apply to all local files) by changing the URL in the <i>fetch</i> call from a local one to the website using the "https" protocol, but it's a different beast entirely for when I fetch data from the Traccar server. It all comes down to the fact that the website is running on a HTTPS server, while the Traccar instance is running on an HTTP server, and browsers universally block requests from HTTPS origins to HTTP hosts. There are a few ways I've considered going about this:
+						<ol>
+							<li><i>Run the Traccar instance as an HTTPS server.</i> This would involve setting up an HTTPS proxy server that would be between the origins (requestors) and the host (Traccar server). I can do this with Apache, but I am already using Apache for the web server (on the same machine) and am not prepared with the knowledge on how to set up two separate web servers on the same machine using only Apache. I <i>think</i> there is a way to do this, and I can probably read up on it and do it, but I want to leave this as a last resort.</li>
+							<li><i>Instead of using the Traccar API, I can instead run some a script locally drawing directly from the Traccar database (MySQL).</i> This may just be what I end up doing. Since <i>cron</i> cannot handle jobs in second intervals, the route to go may be a Python script set to run at an interval by a Bash script.</li>
+							<li>Another partial solution was adding <span class="file-path">&lt;meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"&gt;</span> to my <span class="file-path">index.html</span>, but my understanding is that only elevates requests made via HTTP to HTTPS, which, if the host can't handle HTTPS, is pointless.</li>
+						</ol>
+					</li>
+				</ul>
+				<h3>2024-10-30</h3>
+				<ul>
+					<li><b>Tracking Device:</b> Unfortunately, the Freematics ONE+ did not work out in the field. They tested the device plugged into the OBD port of the trolley and while it turned on, it did not report any data to the server. It seems that the device was not connecting to the trolley's on-board WiFi whatsoever. Even after guiding them through re-uploading the sketch with the verified WiFi information using PlatformIO IDE, it wouldn't budge. Therefore, for now and probably permanently, the Freematics device is a no-go.
+					<p>Alternatively, we will be using a cellphone, probably an old iPhone they have laying around, and the Traccar Client app. This setup is way more straightforward and hassle-free, and despite the potential benefits the Freematics device presented (namely power via OBD and other vehicle-related data reporting), I admit this is the route we should have gone with from the get-go...</p>
+					<p>Setting up a phone to use Traccar Client is rather simple. All it takes is downloading the Traccar Client app, adding the device identifier provided in the app to the Traccar instance running on the Data Server, providing the correct server URL in the Client app, and toggling the service. We've tested this several times on multiple devices and there have been no issues. This is the really, really easy part though. Everything else, for me at least, is much harder to deal with.</p></li>
+					<li><b>Data Server:</b> The Traccar instance running on the instance is just fine still. I am learning how to properly send HTTP requests to it to get the data needed for the webmap, though I am finding it difficult to understand the documentation for the API. It doesn't help that the maintainer of the software loves giving dry, unhelpful responses to questions that point to exactly what I am having issues with.</li>
+					<li><b>Web Server:</b> I haven't yet set up DNS for the web server yet as I haven't been told a domain name. However, once the time comes, I'll also have to setup SSL/TLS as this will be a very public-facing website. This will be a good opportunity to learn about web security and SSL/TLS, the lessons from which I hope to apply to this website and any others I will create in the future.</li>
+					<li><b>Webmap:</b> This is where the magic is <i>supposed</i> to happen. I am not very concerned with the Leaflet stuff (styling, the route, etc.) What I am concerned about is setting up the Fetch constructs correctly to make the HTTP requests to get the position data of the trolley tracker from Traccar. One particular issue I am having right now is authenticating my requests. I'll write on this more extensively later, but I am getting a <span class="file-path">401: Unauthorized error</span> when I make my request. The headers I include in my request contain a base 64-encoded username/password combo, the username and password being those credentials I use to log into the Traccar manager running on the server. For one, I don't even know if that's the username/password combo that I am supposed to be providing, further yet if I am even <i>supposed</i> to be providing a username/password in the header. If I am, though, I don't know if "basic" is the right authentication method. This will all take more learning, Googling, and ChatGPTing that I have very little time to do.</li>
+				</ul>
+				<p><b>Let me try to summarize what I have left to do:</b></p>
+				<ul>
+					<li class="todo-completed">
+						Register domain(s), configure DNS, and configure TLS/SSL.
+						<ul>
+							<li class="todo-completed">Register domain(s) with CloudFlare after checking for availability.</li>
+							<li class="todo-completed">Configure DNS records for domain(s) in CloudFlare.</li>
+							<li class="todo-completed">Research to see if CloudFlare proxy conflicts with SSL/TLS. If not, proceed.</li>
+							<li class="todo-completed">Configure SSL/TLS.</li>
+						</ul>
+					</li>
+					<li>
+						Successfully retrieve position data for the test device from Traccar using Fetch API or WebSocket API.
+						<ul>
+							<li>This may be easier due to the request going to and coming from the same machine, just different ports.</li>
+						</ul>
+					</li>
+					<li>
+						Establish a stable connection between webmap (web server) and Traccar (data server).
+					</li>
+					<li class="todo-completed">
+						Reconfigure connection to acquire data from correct tracking device.
+					</li>
+					<li class="todo-completed">
+						Properly organize webmap code (integrating scripts with <span class="file-path">index.html</span>).
+					</li>
+					<li>
+						Stylize Leaflet and webpage.
+					</li>
+				</ul>
+				<h3>2024-10-21</h3>
+				<p>I've managed to get some, but not a whole lot, more progress over the last days:</p>
+				<ul>
+					<li><b>Tracking Device:</b> I ran tests in the outdoors and the GNSS sensor does indeed collect the correct latitude/longitude. I observed this through the serial monitor in the PlatformIO IDE through VSCode. However, when I ran the test outdoors, I set up the <span class="file-path">config.h</span> file to connect to my mobile hotspot, and for whatever reason, it refused to connect to it. I made sure my hotspot was discoverable while the device was attempting to connect to it, and I even tested that the tracking device could connect to the hotspot back in my apartment with success, I think. But, I can no longer replicate this success.
+					<p>So, back in my apartment, I have resorted to using my home WiFi for the Freematics sketch. <b>I must remember to fill <span class="file-path">config.h</span> with the trolley WiFi information before sending the device back.</b> It is still, as expected, sending 0, 0 to the Traccar server, but it is at least sending information over, confirming the WiFi connection is stable.</p>
+					<p>My thought right now is to send the device back tomorrow <i>hoping</i> that it works out just fine, and in the meantime, I'll use my phone with the Traccar Client application installed for testing purposes. I registered my phone with the Traccar Manager in the server and confirmed that it connects fine and relays location correctly. So I'll use data from my phone in the Traccar server database as a placeholder, and then eventually change any corresponding endpoint/database info in the codebase to fit the Freematics device when that time comes.</p>
+					<p>If I can't get the Freematics device to work over there, I will advise that they return it and instead use an Android phone with the Traccar Client app. This probably would've been the much simpler and straight-forward option from the beginning, but as they say, hindsight is 20-20. But to be frank, the tracking device is the least of my concerns right now...</p></li>
+					<li><b>Data Server:</b> The Traccar server is functioning normally as far as I know. I've familiarized myself with it and the MySQL database a bit more, and I should continue to do so as doing so will be key to knowing how to feed the location data to the webmap.</li>
+					<li><b>Web Server:</b> The web server is also functioning fine. I don't have any DNS set up for it yet, but I have to ask what domain name we want to go with so I can set that up. I will probably register the domain with CloudFlare as that's what I am used to. I am not sure if DigitalOcean requires any additional DNS configuration with their droplets, but I will have to look into that too.</li>
+					<li><b>Webmap:</b> This is perhaps where I am at my weakest. I've laid out a skeleton with a navigation bar and a Leaflet map instance, and I've even loaded the route as a GeoJSON, but I am very, very ripe with the Javascript required to fully develop this.
+						<ul>
+							<li>For one, I would like the script that loads the Leaflet map to be a separate file that I then reference into the <span class="file-path">index.html</span> instead of an "inline script". This is because said script is bound to get pretty chunky, as it already has with the route GeoJSON which consists of several hundred points.
+							<p>It is a smart idea to look at how other people have constructed Leaflet projects.</p></li>
+							<li>I also need a Javascript refresher, and I need to learn asynchronous Javascript and how to write Javascript to interact with a web server and its files.</li>
+							<li>Probably related to the latter item, I need to figure out what entity I should be reading from for realtime location data from Traccar. This is where the Traccar API comes in, but they already threw me off with the mention of the endpoint being <span class="file-path">/api/socket</span> (this is the endpoint for their WebSocket API, which differs from their REST API endpoint; I assume I'll need to use the WebSocket API for realtime data as indicated on their API page: <a href="https://www.traccar.org/traccar-api/">https://www.traccar.org/traccar-api/</a>.) It is also entirely possible that I don't have to use the API at all and I can instead get away with interacting with the database or perhaps some .csv or other file in the server. But, I suppose APIs are supposed to make interacting with applications easier, so it's probably best that I try to use the API first.</li>
+						</ul>
+					</li>
+				</ul>
+				<h3>2024-10-17, 2024-10-16, 2024-10-15, 2024-10-13</h3>
+				<p>By this point, I've had this project on my plate for more than a few months, progressively chipping away at the research part of it but never really bringing it to a point where I can confidently say I know what I have to do.</p>
+				<p>Let me break down the components of this project in order to describe the research I've done to this point and what is left (which is everything, basically):</p>
+				<ul>
+					<li>
+						<b>Tracking Device:</b> I am using a Freematics ONE+ Model A with an external GNSS receiver. The device will connect to the trolley via OBD-II, though I am currently connecting to my computer via USB. Eventually (soon), I'll have to test on a vehicle.
+						<ul>
+							<li><b>Status:</b> The device is semi-operational. It turns on O.K. connecting to my laptop via USB. To get the device working as it should, I had to load and compile the telelogger sketch made available by Freematics (read the Developer Guide here: <a href="https://freematics.com/pages/products/freematics-one-plus/">https://freematics.com/pages/products/freematics-one-plus/</a> and the sketch source code here: <a href="https://github.com/stanleyhuangyc/Freematics/tree/master/firmware_v5/">https://github.com/stanleyhuangyc/Freematics/tree/master/firmware_v5/</a>). We had tried going the Freematics Arduino Builder route before with no success, so I went the PlatformIO route instead. I installed VS Code and the PlatformIO extension, which provided the Serial Monitor, which itself was key to checking on the state of the device as it communicated with the server.
+							<p>So I uploaded the sketch successfully after modifying <span class="file-path">config.h</span> to include the correct WiFi and server information. Checking the Traccar Manager confirmed that I installed the Traccar server correctly onto the virtual private server, registered the device correctly there, and configured the Freematics sketch properly. However, the device reported a 0, 0 latitude/longitude (what I learned is called the "null island").</p>
+							<p>This is where we're at now. I haven't managed to find a fix for it, but I wonder if this is because I've done all testing from the comfort of my apartment. Perhaps by testing by connecting to a vehicle via OBD-II, in motion and outdoors, I may get a different result. Another potentially confounding factor is the storage situation. I believe I asked the powers that be to purchase the device including the microSD card (which I believe should already come installed with the option of including it selected), but I have to verify by opening the little port on the side of the device. After verifying, I must go into <span class="file-path">config.h</span> and make sure it forces storage to the microSD.</p>
+							<p>While time passes as I get the opportunity to test with a vehicle, it's best that I go ahead and work on setting up the domain, web server, front-end, and back-end. I have a location data stream at least (though it's 0, 0), so it's something that I can get started with.</p></li>
+						</ul>
+					</li>
+					<li>
+						<b>Data Server:</b> The data from the Freematics device will transmit the data via WiFi to a Freematics server running on a DigitalOcean droplet listening on port 5170. The virtual private server (VPS) is crucial here in order to have a static IP address. I could go the DuckDNS route but that would just add more points of potential failure. The Freematics server is nice because it integrates a MySQL database as well as the Traccar Manager application which will help with debugging. The idea will be to grab from the database when building the webmap. Traccar has an API which may also be handy.
+					</li>
+					<li>
+						<b>Web Server:</b> The website will run on an Apache2 web server.
+						<ul>
+							<li><b>Status:</b> I set up the web server on the DigitalOcean droplet by doing the following:</li>
+							<ul>
+								<li>SSH'd into the server: <span class="file-path">ssh root@[ipv4 address]</span></li>
+								<li>Installed Apache2: <span class="file-path">apt install apache2</span></li>
+								<li>Configured the Apache2 web server:</li>
+								<ul>
+									<li>
+										Appended the following to <span class="file-path">/etc/apache2/apache2.conf</span>:
+										<br><span class="file-path">ServerName 127.0.0.1</span>
+									</li>
+								</ul>
+								<li>Apache2 defaults to using port 80 for the HTTP protocol and port 443 for HTTPS. I opened both ports in the firewall: <span class="file-path">ufw allow 80 443</span></li>
+								<li>Tested the web server by going to <span class="file-path">[ipv4 address]:80</span></li>
+							</ul>
+						</ul>
+					</li>
+					<li>
+						<b>The Actual Map:</b> A Leaflet.js front-end.
+						<ul>
+							<li><b>Status:</b> I am slowly starting to develop this as I go through the Leaflet.js documentation. I've managed to initialize a map instance, set up some markers, and add the route as a GeoJSON. Right now, the GeoJSON is real ugly so I'll need to prettify it without having Vim go crazy on me since I have braces mapped to automatically close themselves. At some point too, it would be ideal to have the GeoJSON as a separate file imported into the script, but I don't yet understand asynchronous Javascript very well and how I'd direct Leaflet to look for the GeoJSON on the web-server-to-be.</li>
+						</ul>
+					</li>
+				</ul>
+				<h2>References</h2>
+				<h3>Reference Material</h3>
+				<ol class="references">
+					<li><a href="https://www.youtube.com/watch?v=8KX4_4NK7ZY">YouTube - Real time location tracker app on leafletjs</a></li>
+					<li><a href="https://trilliumtransit.com/">Trillium Transit</a></li>
+					<li><a href="https://maps.trilliumtransit.com/map/feed/vinetransit-ca-us/routes/10?noui=true&page_embed=true">Vine Transit Interactive System Map</a></li>
+					<li><a href="https://perthamboytrolley.my.canva.site/">Perth Amboy Trolley Canva Page</a></li>
+					<li><a href="https://github.com/herrdragon/busTrackingGps?tab=readme-ov-file">GitHub - busTrackingGps</a></li>
+					<li><a href="https://github.com/qtrandev/MiamiTrolleyInfo">GitHub - MiamiTrolleyInfo</a></li>
+				</ol>
+				<h3>Traccar</h3>
+				<ol class="references">
+					<li><a href="https://www.traccar.org/troubleshooting/#point-5">Traccar - Troubleshooting</a></li>
+					<li><a href="https://www.traccar.org/devices/">Traccar - Supported Devices</a></li>
+					<li><a href="https://www.reddit.com/r/homeassistant/comments/gsubr9/vehicle_device_tracker_or_how_the_death_of/">Vehicle device tracker (or how the death of Automatic prompted me to find another way to exercise total control over my data and my OBD2 ports)</a></li>
+					<li><a href="https://www.traccar.org/install-digitalocean/">Install Traccar on DigitalOcean VPS</a></li>
+					<li><a href="https://www.traccar.org/api-reference/">Traccar - API Reference</a></li>
+					<li><a href="https://www.traccar.org/traccar-api/">Traccar - API</a></li>
+					<li><a href="https://github.com/traccar/traccar/blob/master/src/main/java/org/traccar/config/Keys.java">GitHub - traccar - config</a></li>
+					<li><a href="https://www.traccar.org/configuration-file/">Traccar - Configuration File</a></li>
+				</ol>
+				<h3>Leaflet</h3>
+				<ol class="references">
+					<li><a href="https://github.com/perliedman/leaflet-realtime/tree/master">GitHub - Leaflet Realtime</a></li>
+					<li><a href="https://tomickigrzegorz.github.io/leaflet-examples/">Leaflet Examples</a></li>
+					<li><a href="https://leafletjs.com/examples/quick-start/">Leaflet - Quick Start Guide</a></li>
+					<li><a href="https://www.reddit.com/r/gis/comments/k5poj2/which_tool_leaflet_openlayers_etc_would_you/">Reddit - Which tool (leaflet, OpenLayers etc..) would you recommend for a web map which allows users to change the attribute of vector shapes?</a></li>
+				</ol>
+				<h3>CORS</h3>
+				<ol class="references">
+					<li><a href="https://www.traccar.org/forums/topic/traccar-cors-configuration/">Traccar - CORS Configuration</a></li>
+					<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin">MDN - Access-Control-Allow-Origin</a></li>
+					<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/upgrade-insecure-requests">MDN - upgrade-insecure-requests</a></li>
+					<li><a href="https://stackoverflow.com/questions/10636611/how-does-the-access-control-allow-origin-header-work">StackOverflow - How does the 'Access-Control-Allow-Origin' header work?</a></li>
+				</ol>
+				<h3>Freematics</h3>
+				<ol class="references">
+					<li><a href="https://freematics.com/pages/products/freematics-one-plus/guide/">Freematics ONE Developer Guide</a></li>
+				</ol>
+				<h3>Fetch API</h3>
+				<ol class="references">
+					<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function">MDN - async function</a></li>
+					<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch">MDN - Using the Fetch API</a></li>
+				</ol>
+			</div>
+		</div>
+		<div id="footer">
+			
+		</div>
+	</body>
+</html> 

@@ -1,0 +1,331 @@
+html,
+body {
+	padding: 0;
+	margin: 0;
+
+	font-family: Arial;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	height: 100vh;
+	background-color: hsl(0, 0%, 15%);
+}
+
+a {
+	text-decoration: none;
+}
+
+
+/* ---------------- Header ---------------- */
+
+#header {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	margin: 25px 0;
+}
+
+#header a {
+	display: flex;
+	align-items: center;
+}
+
+#header a img {
+	height: 100px;
+}
+
+
+/* ----------------- Main ------------------ */
+
+#main {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	background-color: hsl(0, 0%, 90%);
+	border: 2px solid black;
+	border-left: 0;
+	border-right: 0;
+	box-shadow: 0 0 10px 5px hsl(0, 0%, 25%), inset 0 0 10px 5px hsl(0, 0%, 80%);
+}
+
+#nav-links {
+	flex: 0 0 fit-content;
+	display: flex;
+	justify-content: center;
+	height: fit-content;
+	padding: 0 25px;
+}
+
+.nav-link {
+	padding: 12px;
+	border: 0;
+	border-bottom: 3px solid black;
+	background-color: black;
+	color: hsl(0, 0%, 90%);
+	font-size: 16px;
+	font-weight: 900;
+}
+
+.nav-link:hover {
+	cursor: pointer;
+	color: black;
+}
+#home {
+	border-bottom-color: hsl(350, 90%, 70%);
+}
+
+#home:hover {
+	background-color: hsl(350, 90%, 70%);
+}
+
+#projects {
+	border-bottom-color: hsl(30, 90%, 70%);
+}
+
+#projects:hover {
+	background-color: hsl(30, 90%, 70%);
+}
+
+#blog {
+	border-bottom-color: hsl(100, 90%, 70%);
+}
+
+#blog:hover {
+	background-color: hsl(100, 90%, 70%);
+}
+
+#wiki {
+	border-bottom-color: hsl(240, 90%, 70%);
+}
+
+#wiki:hover {
+	background-color: hsl(240, 90%, 70%);
+}
+
+#content {
+	padding: 25px;
+	padding-top: 15px;
+}
+
+h1 {
+	font-size: 24px;
+	font-weight: bold;
+	margin: 15px 0;
+	margin-bottom: 5px;
+}
+
+h1:before {
+	content: ">";
+	margin-right: 6px;
+}
+
+h2 {
+	font-size: 20px;
+	font-weight: bold;
+	margin: 15px 0;
+	margin-bottom: 5px;
+}
+
+h2:before {
+	content: ">>";
+	margin-right: 6px;
+}
+
+h3 {
+	font-size: 16px;
+	font-weight: bold;
+	margin: 15px 0;
+	margin-bottom: 5px;
+}
+
+h3:before {
+	content: ">>>";
+	margin-right: 6px;
+}
+
+h4 {
+	font-size: 16px;
+	font-weight: bold;
+	margin: 10px 0;
+	margin-bottom: 5px;
+}
+
+h4:before {
+	content: ">>>>";
+	margin-right: 6px;
+}
+
+h5 {
+	font-size: 16px;
+	font-weight: bold;
+	margin: 10px 0;
+	margin-bottom: 5px;
+}
+
+h5:before {
+	content: ">>>>>";
+	margin-right: 6px;
+}
+
+h6 {
+	font-size: 16px;
+	font-weight: bold;
+	margin: 5px 0;
+	margin-bottom: 5px;
+}
+
+h6:before {
+	content: ">>>>>>";
+	margin-right: 6px;
+}
+
+p {
+	font-size: 16px;
+	text-align: justify;
+	margin: 3px 0;
+	text-indent: 24px;
+}
+
+p:first-of-type {
+	text-indent: 0;
+}
+
+.sub-paragraph {
+	margin-left: 30px;
+}
+
+.file-path {
+	width: fit-content;
+	font-family: 'Courier New';
+	font-size: 14px;
+	padding: 0 4px;
+	border-radius: 6px;
+	background-color: hsl(0, 0%, 80%);
+}
+
+img {
+	margin-top: 10px;
+}
+
+.img-caption {
+	display: flex;
+	margin-top: 5px;
+	font-size: 12px;
+	font-style: italic;
+	justify-content: center;
+}
+
+ul {
+	padding: 0;
+	margin: 0;
+	margin-left: 16px;
+	list-style: outside;
+}
+
+li {
+	padding-left: 8px;
+	font-size: 16px;
+	text-align: justify;
+	margin-left: 16px;
+}
+
+ul > li::marker {
+	content: "~ ";
+	font-size: 16px;
+	font-weight: bolder;
+}
+
+ol {
+	padding: 0;
+	margin: 0;
+	margin-left: 16px;
+}
+
+.todo-completed {
+	font-style: italic;
+	text-decoration: line-through;
+	color: hsl(0, 0%, 60%);
+}
+
+table {
+	table-layout: fixed;
+	width: 100%;
+	font-size: 14px;
+	border: 1px solid black;
+	border-bottom: none;
+	border-spacing: 0;
+	background-color: hsl(0, 0%, 90%);
+}
+
+table li,
+table li::marker {
+	font-size: 14px;
+}
+
+th {
+	font-weight: bold;
+	background-color: hsl(0, 0%, 60%);
+	border-right: 1px solid black;
+}
+
+th:last-child {
+	border-right: none;
+}
+
+th, td {
+	border-bottom: 1px solid black;
+	padding: 3px;
+}
+
+td {
+	border-bottom: 1px solid black;
+	border-right: 1px solid hsl(0, 0%, 80%);
+	word-wrap: break-word;
+}
+
+td.subheading {
+	font-weight: bold;
+	background-color: hsl(0, 0%, 80%);
+}
+
+
+/* ------------ Particulars ---------------- */
+
+.references li {
+	font-size: 12px;
+}
+
+.references li::marker {
+	content: "[" counter(list-item) "]";
+}
+
+.ref {
+	position: relative;
+	font-size: 10px;
+	bottom: 6px;
+}
+
+#wiki-research-topics-list tr td:nth-child(3) {
+	text-align: center;
+}
+
+#wiki-research-topics-list {
+	flex: 1;
+}
+
+.wiki-wiki-wip {
+	color: red;
+}
+
+
+/* ----------------- Footer ---------------- */
+
+#footer {
+	flex: 0 0 auto;
+	width: 100%;
+	height: 25px;
+}
